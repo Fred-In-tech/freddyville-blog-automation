@@ -1,0 +1,502 @@
+{
+  "version": 1,
+  "project": {
+    "name": "Freddyville Daily Blog Agent",
+    "slug": "freddyville-blog-automation",
+    "tagline": "Weekday SEO/AEO blog agent — researches, writes, verifies its image, ships",
+    "iconDomain": "freddyvillemedia.com",
+    "date": "2026-09-01"
+  },
+  "stats": {
+    "agents": 1,
+    "models": 1,
+    "tools": 4,
+    "integrations": 2
+  },
+  "topModels": [
+    {
+      "id": "claude",
+      "label": "Claude",
+      "domain": "anthropic.com"
+    }
+  ],
+  "topTools": [
+    {
+      "id": "websearch",
+      "label": "WebSearch"
+    },
+    {
+      "id": "curl",
+      "label": "curl (image fetch)"
+    },
+    {
+      "id": "sips",
+      "label": "sips (image optimize)"
+    },
+    {
+      "id": "git",
+      "label": "git"
+    }
+  ],
+  "topIntegrations": [
+    {
+      "id": "github",
+      "label": "GitHub",
+      "domain": "github.com"
+    },
+    {
+      "id": "unsplash",
+      "label": "Unsplash",
+      "domain": "unsplash.com"
+    }
+  ],
+  "graph": {
+    "nodes": [
+      {
+        "id": "sched",
+        "label": "Weekday 9am schedule",
+        "kind": "cron",
+        "detail": "Fires the run every weekday morning with no human in the loop.",
+        "sourceRef": "scheduled-tasks/freddyville-daily-blog"
+      },
+      {
+        "id": "spec",
+        "label": "Run spec (SKILL.md)",
+        "kind": "entry",
+        "sub": "7-step contract",
+        "detail": "A single markdown file is the whole program: research, dedupe, write, illustrate, insert, verify, ship.",
+        "sourceRef": "scheduled-tasks/freddyville-daily-blog/SKILL.md"
+      },
+      {
+        "id": "runner",
+        "label": "Daily blog agent",
+        "kind": "agent",
+        "sub": "autonomous run, one post",
+        "detail": "Executes the spec end to end and reports back the title, slug, source and image used.",
+        "sourceRef": "scheduled-tasks/freddyville-daily-blog/SKILL.md:17"
+      },
+      {
+        "id": "claude",
+        "label": "Claude",
+        "kind": "model",
+        "domain": "anthropic.com",
+        "detail": "Does the reasoning, the writing and the visual check on the candidate image.",
+        "sourceRef": "scheduled-tasks/freddyville-daily-blog/SKILL.md"
+      },
+      {
+        "id": "websearch",
+        "label": "WebSearch news sweep",
+        "kind": "tool",
+        "group": "Research & topic",
+        "detail": "Sweeps AI-in-film, production tech, marketing and general news for something timely.",
+        "sourceRef": "scheduled-tasks/freddyville-daily-blog/SKILL.md:18"
+      },
+      {
+        "id": "houston",
+        "label": "Houston-angle bias",
+        "kind": "service",
+        "group": "Research & topic",
+        "sub": "local hook beats national trend",
+        "detail": "Prefers a story with a concrete Houston sector, event or buyer-behaviour tie-in over a national trend with a local CTA bolted on.",
+        "sourceRef": "scheduled-tasks/freddyville-daily-blog/SKILL.md:18"
+      },
+      {
+        "id": "factguard",
+        "label": "No-fabrication rule",
+        "kind": "service",
+        "group": "Research & topic",
+        "detail": "Stats, quotes and product claims must come from the search results, with 1-2 real source URLs carried into the post.",
+        "sourceRef": "scheduled-tasks/freddyville-daily-blog/SKILL.md:18"
+      },
+      {
+        "id": "dedupe",
+        "label": "Archive dedupe check",
+        "kind": "service",
+        "group": "Research & topic",
+        "sub": "reads every existing post",
+        "detail": "Reads the whole archive before choosing, so no topic or slug repeats across dozens of prior runs.",
+        "sourceRef": "lib/blog-posts.js"
+      },
+      {
+        "id": "topic",
+        "label": "Topic + slug decision",
+        "kind": "service",
+        "group": "Research & topic",
+        "detail": "One angle per run, with a keyword-rich kebab-case slug that has to be unique in the archive.",
+        "sourceRef": "scheduled-tasks/freddyville-daily-blog/SKILL.md:25"
+      },
+      {
+        "id": "draft",
+        "label": "Draft (700-1100 words)",
+        "kind": "service",
+        "group": "Draft & voice",
+        "detail": "Original commentary synthesised from the news, tied back to what it means for Houston brands.",
+        "sourceRef": "scheduled-tasks/freddyville-daily-blog/SKILL.md:20"
+      },
+      {
+        "id": "voicerules",
+        "label": "VOICE word lists",
+        "kind": "store",
+        "group": "Draft & voice",
+        "sub": "13 preferred / 14 banned",
+        "detail": "The brand voice is data, not vibes: an explicit preferred list and a hard banned list of hype words.",
+        "sourceRef": "lib/constants.js:507"
+      },
+      {
+        "id": "voicegate",
+        "label": "Banned-word gate",
+        "kind": "service",
+        "group": "Draft & voice",
+        "detail": "Copy containing any banned word or phrase gets rewritten before it can ship.",
+        "sourceRef": "lib/constants.js:514"
+      },
+      {
+        "id": "aeo",
+        "label": "AEO structure pass",
+        "kind": "service",
+        "group": "Draft & voice",
+        "sub": "answer-first, H2s, bullets",
+        "detail": "Opens with a direct 1-2 sentence answer, then H2 sections and at least one bulleted list so answer engines can extract and cite it.",
+        "sourceRef": "scheduled-tasks/freddyville-daily-blog/SKILL.md:22"
+      },
+      {
+        "id": "meta",
+        "label": "Post metadata",
+        "kind": "service",
+        "group": "Draft & voice",
+        "sub": "excerpt, cat, read, date",
+        "detail": "Meta-description excerpt, one of five categories, a realistic read time and today's date in the site's display format.",
+        "sourceRef": "scheduled-tasks/freddyville-daily-blog/SKILL.md:24"
+      },
+      {
+        "id": "unsplash",
+        "label": "Unsplash search",
+        "kind": "external",
+        "domain": "unsplash.com",
+        "group": "Image pipeline",
+        "detail": "Search page is fetched and a direct CDN photo URL is extracted; licence allows commercial use without attribution.",
+        "sourceRef": "scheduled-tasks/freddyville-daily-blog/SKILL.md:26"
+      },
+      {
+        "id": "curl",
+        "label": "curl download",
+        "kind": "tool",
+        "group": "Image pipeline",
+        "detail": "Pulls the candidate photo to a scratch path before anything is trusted.",
+        "sourceRef": "scheduled-tasks/freddyville-daily-blog/SKILL.md:26"
+      },
+      {
+        "id": "vision",
+        "label": "Visual match check",
+        "kind": "service",
+        "group": "Image pipeline",
+        "sub": "look at it, then decide",
+        "detail": "The agent actually views the downloaded image and rejects it if the subject or city does not match the post.",
+        "sourceRef": "scheduled-tasks/freddyville-daily-blog/SKILL.md:26"
+      },
+      {
+        "id": "sips",
+        "label": "sips optimize",
+        "kind": "tool",
+        "group": "Image pipeline",
+        "sub": "JPEG q82, 1400px wide",
+        "detail": "Re-encodes to a fixed width and quality so page weight stays predictable across every post.",
+        "sourceRef": "public/images/blog/"
+      },
+      {
+        "id": "imgstore",
+        "label": "Blog image store",
+        "kind": "store",
+        "group": "Image pipeline",
+        "detail": "Images are committed to the repo at a path derived from the slug, so the post and its hero can never drift apart.",
+        "sourceRef": "public/images/blog/<slug>.jpg"
+      },
+      {
+        "id": "postsfile",
+        "label": "POSTS data file",
+        "kind": "store",
+        "sub": "single ~470KB module",
+        "detail": "One array of post objects, newest first; the new object is inserted at index 0.",
+        "sourceRef": "lib/blog-posts.js:5"
+      },
+      {
+        "id": "verify",
+        "label": "Parse + shape check",
+        "kind": "service",
+        "detail": "Confirms the edited module still parses and the new object matches the existing shape before anything is committed.",
+        "sourceRef": "scheduled-tasks/freddyville-daily-blog/SKILL.md:28"
+      },
+      {
+        "id": "git",
+        "label": "git commit + push",
+        "kind": "tool",
+        "sub": "one commit per post",
+        "detail": "Commits the data-file edit and the image together under a Blog: <title> message.",
+        "sourceRef": "scheduled-tasks/freddyville-daily-blog/SKILL.md:29"
+      },
+      {
+        "id": "github",
+        "label": "GitHub repo",
+        "kind": "external",
+        "domain": "github.com",
+        "detail": "Push to main is the deploy trigger; the repo is the only durable state the agent keeps.",
+        "sourceRef": "scheduled-tasks/freddyville-daily-blog/SKILL.md:14"
+      },
+      {
+        "id": "build",
+        "label": "Site build + deploy",
+        "kind": "service",
+        "detail": "A Next.js production build runs on push and statically renders every route.",
+        "sourceRef": "package.json"
+      },
+      {
+        "id": "route",
+        "label": "/blog/[slug] route",
+        "kind": "service",
+        "sub": "generateStaticParams",
+        "detail": "Routes are generated from POSTS, so one array insert creates a whole new static page.",
+        "sourceRef": "app/blog/[slug]/page.js:15"
+      },
+      {
+        "id": "index",
+        "label": "/blog index",
+        "kind": "service",
+        "detail": "Lists the archive with a pinned-lead ordering rule applied on top of newest-first.",
+        "sourceRef": "app/blog/page.js"
+      },
+      {
+        "id": "schema",
+        "label": "BlogPosting JSON-LD",
+        "kind": "service",
+        "sub": "ISO-8601 dates",
+        "detail": "Human dates are converted to ISO 8601 with pure string parsing so the timezone can never shift the day.",
+        "sourceRef": "lib/blog-posts.js"
+      },
+      {
+        "id": "sitemap",
+        "label": "sitemap + robots",
+        "kind": "service",
+        "detail": "Every post is enumerated in the sitemap, and AI crawlers are explicitly allowed rather than left to default.",
+        "sourceRef": "app/sitemap.js"
+      },
+      {
+        "id": "engines",
+        "label": "Search + answer engines",
+        "kind": "external",
+        "detail": "The intended readers are as much AI answer engines as humans, which is why structure is a hard requirement.",
+        "sourceRef": "app/robots.js"
+      }
+    ],
+    "edges": [
+      {
+        "from": "sched",
+        "to": "spec",
+        "kind": "triggers",
+        "label": "weekday 9am"
+      },
+      {
+        "from": "spec",
+        "to": "runner",
+        "kind": "triggers",
+        "label": "one post per run"
+      },
+      {
+        "from": "runner",
+        "to": "claude",
+        "kind": "calls",
+        "label": "write + look"
+      },
+      {
+        "from": "runner",
+        "to": "websearch",
+        "kind": "calls"
+      },
+      {
+        "from": "websearch",
+        "to": "houston",
+        "kind": "writes",
+        "label": "candidate stories"
+      },
+      {
+        "from": "houston",
+        "to": "factguard",
+        "kind": "calls",
+        "label": "needs real source"
+      },
+      {
+        "from": "factguard",
+        "to": "topic",
+        "kind": "writes"
+      },
+      {
+        "from": "dedupe",
+        "to": "topic",
+        "kind": "writes",
+        "label": "rejects repeats"
+      },
+      {
+        "from": "postsfile",
+        "to": "dedupe",
+        "kind": "reads",
+        "label": "existing slugs"
+      },
+      {
+        "from": "topic",
+        "to": "draft",
+        "kind": "triggers"
+      },
+      {
+        "from": "claude",
+        "to": "draft",
+        "kind": "writes"
+      },
+      {
+        "from": "voicerules",
+        "to": "voicegate",
+        "kind": "reads",
+        "label": "banned list"
+      },
+      {
+        "from": "draft",
+        "to": "voicegate",
+        "kind": "calls"
+      },
+      {
+        "from": "voicegate",
+        "to": "aeo",
+        "kind": "triggers",
+        "label": "rewrite on hit"
+      },
+      {
+        "from": "aeo",
+        "to": "meta",
+        "kind": "triggers"
+      },
+      {
+        "from": "topic",
+        "to": "unsplash",
+        "kind": "reads",
+        "label": "topic keywords"
+      },
+      {
+        "from": "unsplash",
+        "to": "curl",
+        "kind": "writes",
+        "label": "CDN photo url"
+      },
+      {
+        "from": "curl",
+        "to": "vision",
+        "kind": "writes",
+        "label": "to scratch file"
+      },
+      {
+        "from": "claude",
+        "to": "vision",
+        "kind": "calls",
+        "label": "views the image"
+      },
+      {
+        "from": "vision",
+        "to": "unsplash",
+        "kind": "calls",
+        "label": "retry on mismatch"
+      },
+      {
+        "from": "vision",
+        "to": "sips",
+        "kind": "triggers",
+        "label": "on match only"
+      },
+      {
+        "from": "sips",
+        "to": "imgstore",
+        "kind": "writes",
+        "label": "q82 @ 1400px"
+      },
+      {
+        "from": "meta",
+        "to": "postsfile",
+        "kind": "writes",
+        "label": "insert at index 0"
+      },
+      {
+        "from": "imgstore",
+        "to": "postsfile",
+        "kind": "reads",
+        "label": "img path by slug"
+      },
+      {
+        "from": "postsfile",
+        "to": "verify",
+        "kind": "reads"
+      },
+      {
+        "from": "verify",
+        "to": "git",
+        "kind": "triggers",
+        "label": "only if it parses"
+      },
+      {
+        "from": "imgstore",
+        "to": "git",
+        "kind": "reads"
+      },
+      {
+        "from": "git",
+        "to": "github",
+        "kind": "writes",
+        "label": "push to main"
+      },
+      {
+        "from": "github",
+        "to": "build",
+        "kind": "triggers",
+        "label": "push deploys site"
+      },
+      {
+        "from": "postsfile",
+        "to": "route",
+        "kind": "reads",
+        "label": "params from POSTS"
+      },
+      {
+        "from": "postsfile",
+        "to": "index",
+        "kind": "reads"
+      },
+      {
+        "from": "postsfile",
+        "to": "sitemap",
+        "kind": "reads",
+        "label": "one url per post"
+      },
+      {
+        "from": "build",
+        "to": "route",
+        "kind": "triggers"
+      },
+      {
+        "from": "build",
+        "to": "index",
+        "kind": "triggers"
+      },
+      {
+        "from": "route",
+        "to": "schema",
+        "kind": "writes"
+      },
+      {
+        "from": "schema",
+        "to": "engines",
+        "kind": "writes",
+        "label": "citable structure"
+      },
+      {
+        "from": "sitemap",
+        "to": "engines",
+        "kind": "writes"
+      }
+    ]
+  }
+}

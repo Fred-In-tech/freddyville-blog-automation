@@ -2,9 +2,9 @@
 
 An unattended weekday agent that researches, writes, illustrates and ships one SEO/AEO blog post to a live production site.
 
-[![Architecture map](banner.png)](https://fred-in-tech.github.io/fvm-system-maps/freddyville-blog-automation/)
+[![Architecture map](banner.png)](https://fred-in-tech.github.io/freddyville-blog-automation/map/)
 
-*Interactive, pannable version: [open the architecture map](https://fred-in-tech.github.io/fvm-system-maps/freddyville-blog-automation/)*
+*Interactive, pannable version: [open the architecture map](https://fred-in-tech.github.io/freddyville-blog-automation/map/)*
 
 ## What it is
 

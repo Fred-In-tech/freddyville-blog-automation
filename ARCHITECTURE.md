@@ -2,7 +2,7 @@
 
 Deeper notes on how the daily blog agent is put together, and why it is shaped this way.
 
-Interactive map: [architecture map](https://fred-in-tech.github.io/fvm-system-maps/freddyville-blog-automation/)
+Interactive map: [architecture map](https://fred-in-tech.github.io/freddyville-blog-automation/map/)
 
 ## The design constraint: no infrastructure
 
